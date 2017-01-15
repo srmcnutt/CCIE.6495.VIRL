@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<topology xmlns="http://www.cisco.com/VIRL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="0.9" xsi:schemaLocation="http://www.cisco.com/VIRL https://raw.github.com/CiscoVIRL/schema/v0.9/virl.xsd">
-    <node name="SP1" type="SIMPLE" subtype="IOSv" location="929,429">
+<topology xmlns="http://www.cisco.com/VIRL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="0.95" xsi:schemaLocation="http://www.cisco.com/VIRL https://raw.github.com/CiscoVIRL/schema/v0.95/virl.xsd">
+    <node name="SP1" type="SIMPLE" subtype="IOSv" location="306,350">
         <extensions>
             <entry key="config" type="String">!
-! Last configuration change at 02:50:17 UTC Thu Nov 24 2016
+! Last configuration change at 21:26:59 UTC Sun Jan 15 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -66,7 +66,7 @@ interface Loopback0
  ip address 99.99.99.99 255.255.255.255
 !
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.22 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -147,10 +147,10 @@ end</entry>
         <interface id="1" name="GigabitEthernet0/2"/>
         <interface id="2" name="GigabitEthernet0/3"/>
     </node>
-    <node name="BR1" type="SIMPLE" subtype="IOSv" location="834,567">
+    <node name="BR1" type="SIMPLE" subtype="IOSv" location="158,555">
         <extensions>
             <entry key="config" type="String">!
-! Last configuration change at 02:49:59 UTC Thu Nov 24 2016
+! Last configuration change at 21:26:40 UTC Sun Jan 15 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -251,16 +251,14 @@ interface Loopback113
 interface Loopback1009
  no ip address
 !
-interface Tunnel11
- no ip address
-!
 interface Tunnel100
  ip address 172.16.100.2 255.255.255.0
  no ip redirects
  ip nhrp authentication 100
  ip nhrp map multicast 192.168.11.1
  ip nhrp network-id 100
- ip nhrp nhs 172.16.100.1 nbma 192.168.11.1 multicast
+ ip nhrp nhs 172.16.100.1 nbma 192.168.11.1
+ ip nhrp shortcut
  tunnel source GigabitEthernet0/1
  tunnel mode gre multipoint
  tunnel key 100
@@ -273,13 +271,40 @@ interface Tunnel111
  ip nhrp authentication 111
  ip nhrp network-id 111
  ip nhrp nhs 172.16.1.1 nbma 192.168.11.1 multicast
+ ip nhrp shortcut
  tunnel source GigabitEthernet0/1
  tunnel mode gre multipoint
  tunnel key 111
  tunnel vrf fvrf
 !
+interface Tunnel112
+ vrf forwarding red
+ ip address 172.16.2.2 255.255.255.0
+ no ip redirects
+ ip nhrp authentication 112
+ ip nhrp network-id 112
+ ip nhrp nhs 172.16.2.1 nbma 192.168.11.1 multicast
+ ip nhrp shortcut
+ tunnel source GigabitEthernet0/1
+ tunnel mode gre multipoint
+ tunnel key 112
+ tunnel vrf fvrf
+!
+interface Tunnel113
+ vrf forwarding green
+ ip address 172.16.3.2 255.255.255.0
+ no ip redirects
+ ip nhrp authentication 113
+ ip nhrp network-id 113
+ ip nhrp nhs 172.16.3.1 nbma 192.168.11.1 multicast
+ ip nhrp shortcut
+ tunnel source GigabitEthernet0/1
+ tunnel mode gre multipoint
+ tunnel key 113
+ tunnel vrf fvrf
+!
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.13 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -325,6 +350,20 @@ router eigrp bubba
  exit-address-family
  !
  address-family ipv4 unicast vrf blue autonomous-system 111
+  !
+  topology base
+  exit-af-topology
+  network 0.0.0.0
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf red autonomous-system 112
+  !
+  topology base
+  exit-af-topology
+  network 0.0.0.0
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf green autonomous-system 113
   !
   topology base
   exit-af-topology
@@ -395,10 +434,10 @@ end</entry>
         <interface id="0" name="GigabitEthernet0/1"/>
         <interface id="1" name="GigabitEthernet0/2"/>
     </node>
-    <node name="BR2" type="SIMPLE" subtype="IOSv" location="1026,570">
+    <node name="BR2" type="SIMPLE" subtype="IOSv" location="465,556">
         <extensions>
             <entry key="config" type="String">!
-! Last configuration change at 02:50:49 UTC Thu Nov 24 2016
+! Last configuration change at 21:33:09 UTC Sun Jan 15 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -481,6 +520,9 @@ redundancy
 !
 !
 !
+interface Loopback100
+ ip address 10.3.100.1 255.255.255.255
+!
 interface Loopback111
  vrf forwarding blue
  ip address 172.16.212.1 255.255.255.255
@@ -493,14 +535,67 @@ interface Loopback113
  vrf forwarding green
  ip address 172.16.232.1 255.255.255.255
 !
+interface Tunnel100
+ ip address 172.16.100.3 255.255.255.0
+ no ip redirects
+ ip nhrp authentication 100
+ ip nhrp map multicast 192.168.11.1
+ ip nhrp network-id 100
+ ip nhrp nhs 172.16.100.1 nbma 192.168.11.1
+ ip nhrp shortcut
+ tunnel source GigabitEthernet0/1
+ tunnel mode gre multipoint
+ tunnel key 100
+ tunnel vrf fvrf
+!
+interface Tunnel111
+ vrf forwarding blue
+ ip address 172.16.1.3 255.255.255.0
+ no ip redirects
+ ip nhrp authentication 111
+ ip nhrp network-id 111
+ ip nhrp nhs 172.16.1.1 nbma 192.168.11.1 multicast
+ ip nhrp shortcut
+ tunnel source GigabitEthernet0/1
+ tunnel mode gre multipoint
+ tunnel key 111
+ tunnel vrf fvrf
+!
+interface Tunnel112
+ vrf forwarding red
+ ip address 172.16.2.3 255.255.255.0
+ no ip redirects
+ ip nhrp authentication 112
+ ip nhrp network-id 112
+ ip nhrp nhs 172.16.2.1 nbma 192.168.11.1 multicast
+ ip nhrp shortcut
+ tunnel source GigabitEthernet0/1
+ tunnel mode gre multipoint
+ tunnel key 112
+ tunnel vrf fvrf
+!
+interface Tunnel113
+ vrf forwarding green
+ ip address 172.16.3.3 255.255.255.0
+ no ip redirects
+ ip nhrp authentication 113
+ ip nhrp network-id 113
+ ip nhrp nhs 172.16.3.1 nbma 192.168.11.1 multicast
+ ip nhrp shortcut
+ tunnel source GigabitEthernet0/1
+ tunnel mode gre multipoint
+ tunnel key 113
+ tunnel vrf fvrf
+!
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.25 255.255.0.0
  shutdown
  duplex auto
  speed auto
  media-type rj45
 !
 interface GigabitEthernet0/1
+ vrf forwarding fvrf
  ip address 192.168.13.1 255.255.255.0
  duplex auto
  speed auto
@@ -526,6 +621,37 @@ interface GigabitEthernet0/2.113
  encapsulation dot1Q 113
  vrf forwarding green
  ip address 172.16.113.2 255.255.255.0
+!
+!
+router eigrp bubba
+ !
+ address-family ipv4 unicast autonomous-system 1337
+  !
+  topology base
+  exit-af-topology
+  network 0.0.0.0
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf blue autonomous-system 111
+  !
+  topology base
+  exit-af-topology
+  network 0.0.0.0
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf red autonomous-system 112
+  !
+  topology base
+  exit-af-topology
+  network 0.0.0.0
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf green autonomous-system 113
+  !
+  topology base
+  exit-af-topology
+  network 0.0.0.0
+ exit-address-family
 !
 router bgp 31337
  bgp router-id 2.2.2.2
@@ -591,10 +717,10 @@ end</entry>
         <interface id="0" name="GigabitEthernet0/1"/>
         <interface id="1" name="GigabitEthernet0/2"/>
     </node>
-    <node name="DC1" type="SIMPLE" subtype="IOSv" location="925,257">
+    <node name="DC1-R1" type="SIMPLE" subtype="IOSv" location="309,191">
         <extensions>
             <entry key="config" type="String">!
-! Last configuration change at 02:49:55 UTC Thu Nov 24 2016
+! Last configuration change at 21:26:45 UTC Sun Jan 15 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -676,9 +802,6 @@ redundancy
 interface Loopback100
  ip address 10.1.100.1 255.255.255.255
 !
-interface Tunnel11
- no ip address
-!
 interface Tunnel100
  ip address 172.16.100.1 255.255.255.0
  no ip redirects
@@ -686,6 +809,7 @@ interface Tunnel100
  ip nhrp map multicast dynamic
  ip nhrp map multicast 192.168.12.1
  ip nhrp network-id 100
+ ip nhrp redirect
  tunnel source GigabitEthernet0/1
  tunnel mode gre multipoint
  tunnel key 100
@@ -698,13 +822,40 @@ interface Tunnel111
  ip nhrp authentication 111
  ip nhrp map multicast dynamic
  ip nhrp network-id 111
+ ip nhrp redirect
  tunnel source GigabitEthernet0/1
  tunnel mode gre multipoint
  tunnel key 111
  tunnel vrf fvrf
 !
+interface Tunnel112
+ vrf forwarding red
+ ip address 172.16.2.1 255.255.255.0
+ no ip redirects
+ ip nhrp authentication 112
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 112
+ ip nhrp redirect
+ tunnel source GigabitEthernet0/1
+ tunnel mode gre multipoint
+ tunnel key 112
+ tunnel vrf fvrf
+!
+interface Tunnel113
+ vrf forwarding green
+ ip address 172.16.3.1 255.255.255.0
+ no ip redirects
+ ip nhrp authentication 113
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 113
+ ip nhrp redirect
+ tunnel source GigabitEthernet0/1
+ tunnel mode gre multipoint
+ tunnel key 113
+ tunnel vrf fvrf
+!
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.15 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -717,6 +868,13 @@ interface GigabitEthernet0/1
  speed auto
  media-type rj45
 !
+interface GigabitEthernet0/2
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
 !
 router eigrp bubba
  !
@@ -724,6 +882,7 @@ router eigrp bubba
   !
   af-interface Tunnel100
    summary-address 0.0.0.0 0.0.0.0
+   no split-horizon
   exit-af-interface
   !
   topology base
@@ -736,6 +895,31 @@ router eigrp bubba
   !
   af-interface Tunnel111
    summary-address 0.0.0.0 0.0.0.0
+   no split-horizon
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 0.0.0.0
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf red autonomous-system 112
+  !
+  af-interface Tunnel112
+   summary-address 0.0.0.0 0.0.0.0
+   no split-horizon
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 0.0.0.0
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf green autonomous-system 113
+  !
+  af-interface Tunnel113
+   summary-address 0.0.0.0 0.0.0.0
+   no split-horizon
   exit-af-interface
   !
   topology base
@@ -795,9 +979,433 @@ no scheduler allocate
 end</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
+        <interface id="1" name="GigabitEthernet0/2"/>
     </node>
+    <node name="DC1-SW1" type="SIMPLE" subtype="IOSvL2" location="419,195">
+        <extensions>
+            <entry key="config" type="String">!
+! Last configuration change at 21:22:18 UTC Sun Jan 15 2017
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+service compress-config
+!
+hostname Switch
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ media-type rj45
+ negotiation auto
+!
+interface GigabitEthernet0/1
+ media-type rj45
+ negotiation auto
+!
+interface GigabitEthernet0/2
+ media-type rj45
+ negotiation auto
+!
+interface GigabitEthernet0/3
+ media-type rj45
+ negotiation auto
+!
+interface GigabitEthernet1/0
+ media-type rj45
+ negotiation auto
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+!
+!
+control-plane
+!
+banner exec `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner incoming `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner login `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+!
+line con 0
+line aux 0
+line vty 0 4
+!
+!
+end</entry>
+        </extensions>
+        <interface id="0" name="GigabitEthernet0/1"/>
+        <interface id="1" name="GigabitEthernet0/2"/>
+        <interface id="2" name="GigabitEthernet0/3"/>
+        <interface id="3" name="GigabitEthernet1/0"/>
+    </node>
+    <node name="DC1-asav-blue" type="SIMPLE" subtype="ASAv" location="534,81">
+        <interface id="0" name="GigabitEthernet0/0"/>
+        <interface id="1" name="GigabitEthernet0/1"/>
+    </node>
+    <node name="DC1-asav-red" type="SIMPLE" subtype="ASAv" location="534,195">
+        <interface id="0" name="GigabitEthernet0/0"/>
+        <interface id="1" name="GigabitEthernet0/1"/>
+    </node>
+    <node name="DC1-asav-green" type="SIMPLE" subtype="ASAv" location="533,288">
+        <interface id="0" name="GigabitEthernet0/0"/>
+        <interface id="1" name="GigabitEthernet0/1"/>
+    </node>
+    <node name="SP2" type="SIMPLE" subtype="IOSv" location="838,320">
+        <extensions>
+            <entry key="config" type="String">!
+! Last configuration change at 21:28:48 UTC Sun Jan 15 2017
+!
+version 15.6
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname Router
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+ethernet lmi ce
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/2
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+banner exec `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner incoming `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner login `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+!
+line con 0
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+no scheduler allocate
+!
+end</entry>
+        </extensions>
+        <interface id="0" name="GigabitEthernet0/1"/>
+        <interface id="1" name="GigabitEthernet0/2"/>
+    </node>
+    <node name="google" type="SIMPLE" subtype="IOSv" location="962,321">
+        <interface id="0" name="GigabitEthernet0/1"/>
+    </node>
+    <node name="DC1-SW2" type="SIMPLE" subtype="IOSvL2" location="692,199">
+        <interface id="0" name="GigabitEthernet0/1"/>
+        <interface id="1" name="GigabitEthernet0/2"/>
+        <interface id="2" name="GigabitEthernet0/3"/>
+        <interface id="3" name="GigabitEthernet1/0"/>
+    </node>
+    <node name="DC1-R2" type="SIMPLE" subtype="IOSv" location="834,193">
+        <extensions>
+            <entry key="config" type="String">!
+! Last configuration change at 21:28:09 UTC Sun Jan 15 2017
+!
+version 15.6
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname Router
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+ethernet lmi ce
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/2
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+banner exec `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner incoming `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner login `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+!
+line con 0
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+no scheduler allocate
+!
+end</entry>
+        </extensions>
+        <interface id="0" name="GigabitEthernet0/1"/>
+        <interface id="1" name="GigabitEthernet0/2"/>
+    </node>
+    <annotations/>
     <connection dst="/virl:topology/virl:node[1]/virl:interface[1]" src="/virl:topology/virl:node[4]/virl:interface[1]"/>
     <connection dst="/virl:topology/virl:node[2]/virl:interface[1]" src="/virl:topology/virl:node[1]/virl:interface[2]"/>
     <connection dst="/virl:topology/virl:node[3]/virl:interface[1]" src="/virl:topology/virl:node[1]/virl:interface[3]"/>
-    <connection dst="/virl:topology/virl:node[3]/virl:interface[2]" src="/virl:topology/virl:node[2]/virl:interface[2]"/>
+    <connection dst="/virl:topology/virl:node[5]/virl:interface[1]" src="/virl:topology/virl:node[4]/virl:interface[2]"/>
+    <connection dst="/virl:topology/virl:node[6]/virl:interface[1]" src="/virl:topology/virl:node[5]/virl:interface[2]"/>
+    <connection dst="/virl:topology/virl:node[7]/virl:interface[1]" src="/virl:topology/virl:node[5]/virl:interface[3]"/>
+    <connection dst="/virl:topology/virl:node[8]/virl:interface[1]" src="/virl:topology/virl:node[5]/virl:interface[4]"/>
+    <connection dst="/virl:topology/virl:node[6]/virl:interface[2]" src="/virl:topology/virl:node[11]/virl:interface[1]"/>
+    <connection dst="/virl:topology/virl:node[7]/virl:interface[2]" src="/virl:topology/virl:node[11]/virl:interface[2]"/>
+    <connection dst="/virl:topology/virl:node[8]/virl:interface[2]" src="/virl:topology/virl:node[11]/virl:interface[3]"/>
+    <connection dst="/virl:topology/virl:node[11]/virl:interface[4]" src="/virl:topology/virl:node[12]/virl:interface[1]"/>
+    <connection dst="/virl:topology/virl:node[9]/virl:interface[1]" src="/virl:topology/virl:node[12]/virl:interface[2]"/>
+    <connection dst="/virl:topology/virl:node[10]/virl:interface[1]" src="/virl:topology/virl:node[9]/virl:interface[2]"/>
 </topology>

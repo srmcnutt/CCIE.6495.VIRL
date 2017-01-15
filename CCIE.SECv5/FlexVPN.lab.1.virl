@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <topology xmlns="http://www.cisco.com/VIRL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="0.9" xsi:schemaLocation="http://www.cisco.com/VIRL https://raw.github.com/CiscoVIRL/schema/v0.9/virl.xsd">
-    <node name="SP1" type="SIMPLE" subtype="IOSv" location="929,429">
+    <node name="SP1" type="SIMPLE" subtype="IOSv" location="408,425">
         <extensions>
             <entry key="config" type="String">!
 ! Last configuration change at 02:50:17 UTC Thu Nov 24 2016
@@ -147,7 +147,7 @@ end</entry>
         <interface id="1" name="GigabitEthernet0/2"/>
         <interface id="2" name="GigabitEthernet0/3"/>
     </node>
-    <node name="BR1" type="SIMPLE" subtype="IOSv" location="834,567">
+    <node name="BR1" type="SIMPLE" subtype="IOSv" location="272,609">
         <extensions>
             <entry key="config" type="String">!
 ! Last configuration change at 02:49:59 UTC Thu Nov 24 2016
@@ -395,7 +395,7 @@ end</entry>
         <interface id="0" name="GigabitEthernet0/1"/>
         <interface id="1" name="GigabitEthernet0/2"/>
     </node>
-    <node name="BR2" type="SIMPLE" subtype="IOSv" location="1026,570">
+    <node name="BR2" type="SIMPLE" subtype="IOSv" location="515,609">
         <extensions>
             <entry key="config" type="String">!
 ! Last configuration change at 02:50:49 UTC Thu Nov 24 2016
@@ -591,7 +591,7 @@ end</entry>
         <interface id="0" name="GigabitEthernet0/1"/>
         <interface id="1" name="GigabitEthernet0/2"/>
     </node>
-    <node name="DC1" type="SIMPLE" subtype="IOSv" location="925,257">
+    <node name="DC1" type="SIMPLE" subtype="IOSv" location="410,242">
         <extensions>
             <entry key="config" type="String">!
 ! Last configuration change at 02:49:55 UTC Thu Nov 24 2016
